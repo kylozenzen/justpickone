@@ -16,16 +16,15 @@
 
   <title>Just Pick One</title>
   
-  <!-- ANALYTICS SETUP (Uncomment and replace G-XXXXXXXXXX) -->
-  <!--
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTX4NR5643"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
+
+    gtag('config', 'G-GTX4NR5643');
   </script>
-  -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,13 +33,15 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #13131a;
-      --bg-card: rgba(255, 255, 255, 0.03);
-      --border-color: rgba(255, 255, 255, 0.08);
-      --text-primary: #e8e8e8;
-      --text-secondary: #888;
-      --text-muted: #555;
+      /* HIGH CONTRAST UPDATE */
+      --bg-primary: #050508;
+      --bg-secondary: #0a0a0c;
+      --bg-card: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.12);
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --text-muted: #777777;
+      
       --accent: #6366f1;
       --accent-glow: rgba(99, 102, 241, 0.3);
       --success: #22c55e;
@@ -140,7 +141,7 @@
       border-radius: 10px; padding: 10px 12px; cursor: pointer;
       color: var(--text-secondary); font-size: 18px; transition: all 0.2s ease;
     }
-    .settings-btn:hover { background: var(--border-color); }
+    .settings-btn:hover { background: var(--border-color); color: var(--text-primary); }
 
     .screen { display: none; animation: fadeIn 0.4s ease-out; }
     .screen.active { display: block; }
@@ -204,7 +205,7 @@
     .mode-switch-btn {
       width: 100%; padding: 12px; margin-bottom: 24px;
       background: rgba(255,255,255,0.05); border: 1px dashed var(--text-muted);
-      border-radius: var(--radius); color: var(--text-muted);
+      border-radius: var(--radius); color: var(--text-secondary);
       font-size: 13px; cursor: pointer; transition: all 0.2s ease;
     }
     .mode-switch-btn.active {
