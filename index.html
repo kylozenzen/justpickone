@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Stop overthinking. Let the app decide.">
+  
+  <!-- SOCIAL META TAGS (For iMessage/WhatsApp Previews) -->
+  <meta property="og:title" content="Just Pick One">
+  <meta property="og:description" content="The app that stops arguments. Couples Veto Mode included.">
+  <meta property="og:image" content="https://placehold.co/1200x630/0a0a0f/6366f1.png?text=Just+Pick+One"> <!-- Replace with real URL later -->
+  <meta property="og:url" content="https://justpickone.app">
+
+  <title>Just Pick One</title>
+  
+  <!-- ANALYTICS SETUP (Uncomment and replace G-XXXXXXXXXX) -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Comic+Neue:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #13131a;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-primary: #e8e8e8;
+      --text-secondary: #888;
+      --text-muted: #555;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --gold: #FFD700;
+      --danger: #ff4444;
+      --font-main: 'Space Grotesk', -apple-system, sans-serif;
+      --radius: 14px;
+    }
+
+    [data-theme="corporate"] {
+      --bg-primary: #fff5f5;
+      --bg-secondary: #fef3e2;
+      --bg-card: rgba(255, 182, 193, 0.15);
+      --border-color: rgba(255, 182, 193, 0.4);
+      --text-primary: #5c4d4d;
+      --text-secondary: #8b7b7b;
+      --text-muted: #b8a8a8;
+      --accent: #ff69b4;
+      --accent-glow: rgba(255, 105, 180, 0.3);
+      --success: #90EE90;
+      --warning: #FFD700;
+      --font-main: 'Comic Neue', cursive;
+      --radius: 24px;
+    }
+
+    [data-theme="unhinged"] {
+      --bg-primary: #0d0d0d;
+      --bg-secondary: #1a0a1a;
+      --bg-card: rgba(255, 0, 128, 0.1);
+      --border-color: rgba(255, 0, 128, 0.3);
+      --text-primary: #fff;
+      --text-secondary: #ff69b4;
+      --text-muted: #666;
+      --accent: #39ff14;
+      --accent-glow: rgba(57, 255, 20, 0.4);
+      --success: #39ff14;
+      --warning: #ff0080;
+      --font-main: 'Space Grotesk', -apple-system, sans-serif;
+      --radius: 4px;
+    }
+
+    [data-theme="terminal"] {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #0f0f0f;
+      --bg-card: rgba(0, 255, 0, 0.05);
+      --border-color: rgba(0, 255, 0, 0.2);
+      --text-primary: #00ff00;
+      --text-secondary: #00cc00;
+      --text-muted: #006600;
+      --accent: #00ff00;
+      --accent-glow: rgba(0, 255, 0, 0.3);
+      --success: #00ff00;
+      --warning: #ffff00;
+      --font-main: 'VT323', monospace;
+      --radius: 0px;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: linear-gradient(145deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .grain {
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.03; pointer-events: none; z-index: 1;
+    }
+
+    .glow-orb {
+      position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(40px);
+      transition: background 0.5s ease;
+    }
+
+    .container { max-width: 420px; margin: 0 auto; padding: 24px 20px; position: relative; z-index: 2; }
+
+    header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 40px; padding-top: 20px;
+    }
+    .logo-area { cursor: pointer; user-select: none; }
+    h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin: 0 0 4px 0; color: var(--text-primary); }
+    [data-theme="terminal"] h1 { text-transform: uppercase; letter-spacing: 2px; }
+    .tagline { font-size: 13px; color: var(--text-muted); font-style: italic; }
+    [data-theme="terminal"] .tagline { font-style: normal; }
+
+    .settings-btn {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 10px 12px; cursor: pointer;
+      color: var(--text-secondary); font-size: 18px; transition: all 0.2s ease;
+    }
+    .settings-btn:hover { background: var(--border-color); }
+
+    .screen { display: none; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+
+    .input-label { display: block; font-size: 16px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+    [data-theme="terminal"] .input-label { font-size: 20px; }
+
+    .input-wrapper {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius); padding: 4px; margin-bottom: 12px;
+    }
+    input[type="text"] {
+      width: 100%; padding: 18px 20px; font-size: 18px; font-family: var(--font-main);
+      background: transparent; border: none; color: var(--text-primary); outline: none;
+    }
+    [data-theme="terminal"] input[type="text"] { font-size: 22px; }
+    input::placeholder { color: var(--text-muted); }
+
+    .input-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; text-align: center; }
+
+    .btn-primary {
+      width: 100%; padding: 18px 24px; font-size: 16px; font-weight: 600;
+      font-family: var(--font-main);
+      background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, black) 100%);
+      border: none; border-radius: var(--radius); color: #fff; cursor: pointer;
+      transition: all 0.2s ease; box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-primary:disabled { background: var(--bg-card); color: var(--text-muted); box-shadow: none; cursor: not-allowed; }
+    .btn-primary.premium { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4); }
+
+    .btn-secondary {
+      width: 100%; padding: 16px 24px; font-size: 15px; font-family: var(--font-main);
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius); color: var(--text-primary); cursor: pointer;
+      transition: all 0.2s ease; margin-top: 12px;
+    }
+
+    .btn-small {
+      padding: 10px 16px; font-size: 13px; font-family: var(--font-main);
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 20px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-small:hover { background: var(--border-color); color: var(--text-primary); }
+
+    .btn-receipt {
+      display: block; margin: 24px auto 0;
+      background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.1);
+      color: var(--text-secondary);
+    }
+    .btn-receipt:hover { background: rgba(255,255,255,0.05); }
+
+    .picks-remaining {
+      text-align: center; margin-top: 24px; padding: 12px;
+      background: var(--bg-card); border-radius: 10px;
+      font-size: 14px; color: var(--text-muted); transition: all 0.3s ease;
+    }
+    .picks-remaining.low { color: var(--warning); }
+    .picks-remaining.premium { color: var(--gold); background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.2); }
+
+    /* COUPLES MODE STYLES */
+    .mode-switch-btn {
+      width: 100%; padding: 12px; margin-bottom: 24px;
+      background: rgba(255,255,255,0.05); border: 1px dashed var(--text-muted);
+      border-radius: var(--radius); color: var(--text-muted);
+      font-size: 13px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .mode-switch-btn.active {
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      border-color: var(--accent); color: var(--accent);
+      border-style: solid;
+    }
+    
+    .veto-grid { display: flex; flex-direction: column; gap: 12px; margin: 32px 0; }
+    .veto-option {
+      width: 100%; padding: 20px; text-align: left;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius); color: var(--text-primary); font-size: 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .veto-option:hover { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+    .veto-icon { font-size: 20px; opacity: 0.5; }
+    .veto-option:hover .veto-icon { opacity: 1; }
+
+    .quick-picks { margin-top: 32px; }
+    .quick-picks-label {
+      font-size: 12px; color: var(--text-muted); text-align: center;
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .quick-picks-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+    .thinking-container { text-align: center; padding: 80px 20px; }
+    .thinking-orb {
+      width: 80px; height: 80px; margin: 0 auto 32px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      display: flex; align-items: center; justify-content: center;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .thinking-orb-inner {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent); animation: spin 2s linear infinite;
+    }
+    .thinking-text { font-size: 18px; color: var(--text-secondary); font-style: italic; min-height: 27px; }
+    [data-theme="terminal"] .thinking-text { font-style: normal; font-size: 22px; }
+
+    .result-card {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--success) 10%, transparent) 0%, transparent 100%);
+      border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+      border-radius: 24px; padding: 48px 32px; text-align: center; margin-bottom: 24px;
+    }
+    [data-theme="terminal"] .result-card { border-radius: 0; }
+    [data-theme="unhinged"] .result-card { animation: shake 0.5s ease-out; }
+    
+    .result-reveal { font-size: 15px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+    
+    .result-answer { 
+      font-size: 42px; font-weight: 700; color: var(--text-primary); 
+      margin-bottom: 24px; line-height: 1.2; 
+      opacity: 0; animation: typeReveal 0.5s ease-out forwards; 
+    }
+    [data-theme="terminal"] .result-answer { font-size: 48px; }
+
+    .locked-badge {
+      display: inline-block; padding: 8px 16px;
+      background: color-mix(in srgb, var(--success) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+      border-radius: 20px; font-size: 13px; color: var(--success);
+    }
+    [data-theme="terminal"] .locked-badge { border-radius: 0; }
+    .result-lock-msg { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; font-style: italic; }
+    [data-theme="terminal"] .result-lock-msg { font-style: normal; }
+
+    .limit-container { text-align: center; padding: 40px 20px; }
+    .limit-emoji { font-size: 64px; margin-bottom: 24px; }
+    .limit-title { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+    .limit-msg { font-size: 16px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+
+    .settings-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 100; display: none; animation: fadeIn 0.2s ease;
+    }
+    .settings-overlay.active { display: block; }
+    .settings-panel {
+      position: fixed; right: 0; top: 0; bottom: 0; width: 320px; max-width: 90vw;
+      background: var(--bg-primary); border-left: 1px solid var(--border-color);
+      padding: 24px; z-index: 101; overflow-y: auto;
+      transform: translateX(100%); transition: transform 0.3s ease;
+    }
+    .settings-panel.active { transform: translateX(0); }
+    .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .settings-title { font-size: 20px; font-weight: 700; }
+    .settings-close { background: none; border: none; color: var(--text-secondary); font-size: 28px; cursor: pointer; padding: 8px; line-height: 1; }
+    .settings-section { margin-bottom: 32px; }
+    .settings-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+    .theme-grid { display: flex; flex-direction: column; gap: 8px; }
+    .theme-option {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 10px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .theme-option:hover { border-color: var(--text-muted); }
+    .theme-option.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+    .theme-preview {
+      width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .theme-info { flex: 1; }
+    .theme-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .theme-desc { font-size: 12px; color: var(--text-muted); }
+    .theme-option.locked { opacity: 0.5; pointer-events: none; }
+    .theme-option.locked .theme-name::after { content: ' (Pro)'; font-size: 10px; color: var(--gold); margin-left: 4px; }
+
+    /* HISTORY LIST STYLES */
+    .history-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); }
+    .history-item { 
+      padding: 12px; border-bottom: 1px solid var(--border-color); 
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+    .history-query { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-result { font-size: 14px; color: var(--accent); font-weight: 600; }
+    .history-empty { padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px; font-style: italic; }
+    
+    .history-blur { filter: blur(4px); pointer-events: none; user-select: none; }
+    .history-overlay { 
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.6); border-radius: 10px;
+    }
+    .history-lock-btn {
+      background: var(--gold); color: #000; border: none; padding: 8px 16px;
+      border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer;
+    }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat-card { background: var(--bg-card); border-radius: 10px; padding: 16px; text-align: center; }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+
+    .settings-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+    .settings-hint { font-size: 12px; color: var(--text-muted); text-align: center; font-style: italic; }
+
+    .matrix-canvas { position: fixed; inset: 0; z-index: 200; display: none; }
+
+    .easter-overlay {
+      position: fixed; inset: 0; z-index: 200; pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .fatality-text {
+      font-family: 'Impact', sans-serif; font-size: 48px; color: #ff0000;
+      text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000, 0 0 60px #ff0000;
+      animation: fatality-pulse 0.1s infinite alternate;
+      text-transform: uppercase; letter-spacing: 8px;
+    }
+
+    .hadouken {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 60px; height: 60px; border-radius: 50%;
+      background: radial-gradient(circle, #fff 0%, #00bfff 40%, #0066ff 100%);
+      box-shadow: 0 0 30px #00bfff, 0 0 60px #0066ff, -20px 0 40px #00bfff;
+      animation: hadouken-fly 0.6s ease-out forwards;
+    }
+
+    .nyan-container { position: fixed; inset: 0; z-index: 200; overflow: hidden; }
+    .nyan-rainbow {
+      position: absolute; left: 0; right: 0; height: 60px; top: 50%; transform: translateY(-50%);
+      background: repeating-linear-gradient(180deg,
+        #ff0000 0px, #ff0000 10px,
+        #ff8800 10px, #ff8800 20px,
+        #ffff00 20px, #ffff00 30px,
+        #00ff00 30px, #00ff00 40px,
+        #0088ff 40px, #0088ff 50px,
+        #ff00ff 50px, #ff00ff 60px
+      );
+    }
+    .nyan-cat {
+      position: absolute; left: 30%; top: 50%; transform: translate(-50%, -50%);
+      font-size: 48px; animation: nyan-bounce 0.15s ease-in-out infinite alternate;
+    }
+
+    .confetti-piece {
+      position: fixed; width: 10px; height: 10px; z-index: 200;
+      animation: confetti-fall 2.5s ease-out forwards;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes typeReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px) rotate(-1deg); }
+      40% { transform: translateX(8px) rotate(1deg); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    @keyframes fatality-pulse { from { transform: scale(1); } to { transform: scale(1.02); } }
+    @keyframes hadouken-fly { from { left: -100px; } to { left: calc(100% + 100px); } }
+    @keyframes nyan-bounce { from { transform: translate(-50%, -55%); } to { transform: translate(-50%, -45%); } }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    footer { text-align: center; margin-top: 60px; padding-bottom: 40px; }
+    footer p { font-size: 12px; color: var(--text-muted); }
+  </style>
+</head>
+<body data-theme="default">
+  <div class="grain"></div>
+  <div class="glow-orb"></div>
+
+  <div class="container">
+    <header>
+      <div class="logo-area" id="logo">
+        <h1>JUST PICK ONE</h1>
+        <p class="tagline" id="tagline">(you're doing great sweetie)</p>
+      </div>
+      <button class="settings-btn" id="settingsBtn">⚙️</button>
+    </header>
+
+    <!-- INPUT SCREEN -->
+    <div class="screen active" id="inputScreen">
+      <!-- Mode Toggle -->
+      <button class="mode-switch-btn" id="couplesModeBtn">
+        👩‍❤️‍👨 Switch to Couples (Veto) Mode
+      </button>
+
+      <label class="input-label" id="inputPrompt">What trivial nonsense is ruining your life today?</label>
+      <div class="input-wrapper">
+        <input type="text" id="mainInput" placeholder="Thai, Mexican, Burgers..." autocomplete="off">
+      </div>
+      <p class="input-hint" id="inputHint">"A or B" • "Thing 1 vs Thing 2" • "Should I...?"</p>
+      <button class="btn-primary" id="decideBtn" disabled>DECIDE FOR ME</button>
+      <div class="picks-remaining" id="picksRemaining">5 picks remaining today</div>
+      
+      <div class="quick-picks">
+        <p class="quick-picks-label">Common crises</p>
+        <div class="quick-picks-grid">
+          <button class="btn-small quick-pick">What's for dinner?</button>
+          <button class="btn-small quick-pick">Should I go out?</button>
+          <button class="btn-small quick-pick">Yes or No</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VETO SCREEN (Couples Mode Only) -->
+    <div class="screen" id="vetoScreen">
+      <div style="text-align:center; padding-top:20px;">
+        <h2 style="font-size:24px; margin-bottom:8px;">Hand Phone to Partner</h2>
+        <p style="color:var(--text-muted); font-size:15px; margin-bottom:32px;">Tap ONE option to kill it (Veto).</p>
+      </div>
+      
+      <div class="veto-grid" id="vetoGrid">
+        <!-- Buttons injected by JS -->
+      </div>
+    </div>
+
+    <!-- THINKING SCREEN -->
+    <div class="screen" id="thinkingScreen">
+      <div class="thinking-container">
+        <div class="thinking-orb"><div class="thinking-orb-inner"></div></div>
+        <p class="thinking-text" id="thinkingText">Consulting Mercury Retrograde...</p>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div class="screen" id="resultScreen">
+      <div class="result-card">
+        <p class="result-reveal" id="resultReveal">The universe has spoken.</p>
+        <div class="result-answer" id="resultAnswer">Thai</div>
+        <div class="locked-badge">🔒 Locked for 24 hours</div>
+        
+        <button class="btn-small btn-receipt" id="shareBtn">📋 Copy Receipt</button>
+      </div>
+      <p class="result-lock-msg" id="resultLockMsg">Sealed. No take-backs. This is growth.</p>
+      <button class="btn-secondary" id="nextCrisisBtn">Another crisis awaits →</button>
+    </div>
+
+    <!-- LIMIT SCREEN -->
+    <div class="screen" id="limitScreen">
+      <div class="limit-container">
+        <div class="limit-emoji">🫠</div>
+        <h2 class="limit-title">You've hit your limit</h2>
+        <p class="limit-msg" id="limitMsg">5/5. Go make a mistake on your own.</p>
+        <button class="btn-primary" id="upgradeBtn">Unlock Unlimited — $3/mo</button>
+        <button class="btn-secondary" id="resetBtn">Fine, I'll decide myself (reset demo)</button>
+      </div>
+    </div>
+
+    <footer>
+      <p>Made for people who've been staring at DoorDash for 20 minutes</p>
+    </footer>
+  </div>
+
+  <!-- SETTINGS PANEL -->
+
+  <div class="settings-overlay" id="settingsOverlay"></div>
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-header">
+      <span class="settings-title">Settings</span>
+      <button class="settings-close" id="settingsClose">×</button>
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-label">Archive of Regret</p>
+      <div style="position:relative;">
+        <div id="historyContainer" class="history-list">
+          <!-- History injected here -->
+        </div>
+        <div id="historyLockOverlay" class="history-overlay" style="display:none;">
+          <button class="history-lock-btn">🔒 UNLOCK HISTORY (PRO)</button>
+        </div>
+      </div>
+      <button class="btn-small" id="clearHistoryBtn" style="width:100%; margin-top:8px;">Clear Memory</button>
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-label">Theme</p>
+      <div class="theme-grid" id="themeGrid">
+        <div class="theme-option active" data-theme="default">
+          <div class="theme-preview" style="background: linear-gradient(135deg, #0a0a0f, #6366f1);">😐</div>
+          <div class="theme-info">
+            <div class="theme-name">Dead Inside</div>
+            <div class="theme-desc">Dry humor, dark mode, existential</div>
+          </div>
+        </div>
+        <div class="theme-option locked" data-theme="corporate">
+          <div class="theme-preview" style="background: linear-gradient(135deg, #fff5f5, #ff69b4);">✨</div>
+          <div class="theme-info">
+            <div class="theme-name">Corporate Wellness</div>
+            <div class="theme-desc">Toxic positivity, HR email energy</div>
+          </div>
+        </div>
+        <div class="theme-option locked" data-theme="unhinged">
+          <div class="theme-preview" style="background: linear-gradient(135deg, #0d0d0d, #39ff14);">🤪</div>
+          <div class="theme-info">
+            <div class="theme-name">Unhinged</div>
+            <div class="theme-desc">Chaos goblin, ALL CAPS, aggressive</div>
+          </div>
+        </div>
+        <div class="theme-option locked" data-theme="terminal">
+          <div class="theme-preview" style="background: #0a0a0a; color: #00ff00; font-family: monospace;">&gt;_</div>
+          <div class="theme-info">
+            <div class="theme-name">Terminal</div>
+            <div class="theme-desc">Hacker mode, green on black</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-label">Stats</p>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-label">Total Decisions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statToday">5</div>
+          <div class="stat-label">Remaining Today</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <p class="settings-hint">Try typing "upupdowndown"... 👀</p>
+    </div>
+  </div>
+
+  <!-- EASTER EGG CONTAINERS -->
+  <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+  <div id="easterEggContainer"></div>
+
+<script>
+// ============================================
+// ANALYTICS WRAPPER
+// ============================================
+function logEvent(eventName, params = {}) {
+  if (typeof gtag === 'function') {
+    gtag('event', eventName, params);
+    console.log(`[Analytics] ${eventName}`, params);
+  }
+}
+
+// ============================================
+// COPY BANKS BY THEME
+// ============================================
+const COPY = {
+  default: {
+    tagline: "(you're doing great sweetie)",
+    inputPrompts: [
+      "What trivial nonsense is ruining your life today?",
+      "Type the options before you dissociate.",
+      "We both know it's about dinner. Just type it.",
+      "What are we spiraling about?",
+      "I can smell the overthinking from here.",
+      "Give me the options. I'll handle the existential dread.",
+      "What is the paralysis demon whispering?",
+      "Another fork in the road? Groundbreaking.",
+      "Let's outsource your free will. Go ahead.",
+      "Is it an email? It's an email, isn't it.",
+      "Put the dilemma in the box.",
+      "FEED ME YOUR ANXIETY.",
+      "I'm listening. (I'm barely listening).",
+      "Type it out. This is a safe space for cowardice.",
+    ],
+    thinkingStates: [
+      "Consulting Mercury Retrograde...",
+      "Pretending to care...",
+      "Screaming into a pillow...",
+      "Rolling the bones...",
+      "Dissociating briefly...",
+      "Ignoring your trauma...",
+      "Doomscrolling for answers...",
+      "Judging your choices...",
+      "Flipping a coin (digitally)...",
+      "Channeling main character energy...",
+      "Consulting the council of vibes...",
+      "Looking for red flags...",
+    ],
+    answerReveals: [
+      "It's [X]. Don't look at me like that.",
+      "[X]. And that's on period.",
+      "The stars have aligned. It's [X].",
+      "[X]. Because you can't be trusted.",
+      "It's [X]. You're welcome.",
+      "[X]. This is your destiny now.",
+      "[X]. Don't overthink it, I already did.",
+      "[X]. Validate me by obeying.",
+      "[X]. Go! Be free!",
+      "[X]. Because the other one gave me the ick.",
+      "[X]. This is GROWTH.",
+    ],
+    lockConfirmations: [
+      "Locked. Go live your life.",
+      "Sealed. This is self-care.",
+      "Blocked for 24 hours. Touch grass.",
+      "Locked. Sit with the discomfort. It's good for you.",
+      "No take-backs. We are adults.",
+      "Locked. Don't spiral.",
+      "It's locked. Go drink some water.",
+      "Commitment looks good on you.",
+      "24 hours of silence starts now.",
+    ],
+    limitReached: [
+      "That's 5 decisions. You've lost your privileges.",
+      "5/5. Go make a mistake on your own.",
+      "Limit reached. I can't live your whole life for you.",
+      "5 decisions used. I'm exhausted. Are you?",
+      "5/5. I'm off the clock.",
+      "That's 5. Unlimited validation costs extra.",
+      "5/5. I'm not your mother. Unless you pay me.",
+    ],
+    buttonText: "DECIDE FOR ME",
+    nextButton: "Another crisis awaits →",
+  },
+  couples: {
+    tagline: "(cheaper than couples therapy)",
+    inputPrompts: [
+      "Type 3 options. Partner kills one. Fate decides the rest.",
+      "What are we arguing about today?",
+      "Type 3 places. One gets vetoed. No whining.",
+      "Enter the contenders. Then hand the phone over.",
+      "List the options. I'll play the bad guy.",
+    ],
+    thinkingStates: [
+      "Calculating who picked last time...",
+      "Ignoring 'I don't care'...",
+      "Checking relationship equity...",
+      "Consulting the treaty of 2024...",
+      "Reviewing past arguments...",
+      "Reading between the lines...",
+    ],
+    answerReveals: [
+      "It's [X]. If you argue, you do the dishes.",
+      "We're doing [X]. Conversation over.",
+      "[X]. Now put your phones away.",
+      "Fate chose [X]. Don't blame me.",
+      "[X]. It's decided. Love you, bye.",
+      "It's [X]. Try to pretend you're happy.",
+    ],
+    lockConfirmations: [
+      "Locked. No sulking allowed.",
+      "Sealed. Argument resolved.",
+      "Binding arbitration complete.",
+      "Locked. Enjoy your date night.",
+      "Decision final. Hug it out.",
+    ],
+    buttonText: "HAND TO PARTNER (VETO)",
+    nextButton: "Resolve another argument →",
+  },
+  corporate: {
+    tagline: "(you're AMAZING and VALID! ✨)",
+    inputPrompts: [
+      "What exciting opportunity for growth do we have today? 🌟",
+      "Share your challenge! Every problem is a gift! 🎁",
+      "Let's manifest some CLARITY together! ✨",
+      "What adventure awaits your decision-making journey? 🚀",
+      "Type your options! This is a SAFE SPACE! 💕",
+      "What's blocking your inner light today? 🌈",
+      "Share your thoughts! No judgment, only GROWTH! 🌱",
+      "Let's turn this obstacle into an OPPORTUNITY! 💪",
+    ],
+    thinkingStates: [
+      "Manifesting clarity... ✨",
+      "Consulting your inner wisdom...",
+      "Aligning your chakras...",
+      "Sending positive vibes...",
+      "Breathing in abundance...",
+      "Channeling good energy...",
+      "Finding your truth...",
+      "Embracing the journey...",
+    ],
+    answerReveals: [
+      "The universe LOVES you and wants [X] for you! ✨",
+      "[X]! And you're going to CRUSH IT! 💪",
+      "Your authentic self chooses [X]! 🌟",
+      "[X]! This aligns with your highest good! 🙏",
+      "The answer was inside you all along: [X]! 💕",
+      "[X]! You're literally GLOWING right now! ✨",
+      "Trust your journey! It's [X]! 🌈",
+    ],
+    lockConfirmations: [
+      "Sealed with LOVE! You've got this! 💕",
+      "Locked! Now go be your BEST SELF! ✨",
+      "Committed! Growth looks AMAZING on you! 🌟",
+      "Done! Take a moment to celebrate YOU! 🎉",
+      "Locked! Remember: you're ENOUGH! 💪",
+      "Sealed! The universe is SO proud! 🌈",
+    ],
+    limitReached: [
+      "You've used all 5! Time for some SELF-CARE! 💕",
+      "5/5! You're doing AMAZING sweetie! Come back tomorrow! ✨",
+      "Limit reached! Maybe journal about it? 📝",
+      "That's 5! Time to trust YOUR inner voice! 🌟",
+    ],
+    buttonText: "MANIFEST MY ANSWER ✨",
+    nextButton: "More growth awaits! 🌱",
+  },
+  unhinged: {
+    tagline: "(CHAOS REIGNS)",
+    inputPrompts: [
+      "WHAT DO YOU WANT. SPIT IT OUT.",
+      "TYPE FASTER. I DON'T HAVE ALL DAY.",
+      "OH WE'RE DOING THIS AGAIN HUH",
+      "GIVE ME THE OPTIONS. NOW.",
+      "STOP THINKING. START TYPING.",
+      "YOUR INDECISION FUELS ME. CONTINUE.",
+      "ANOTHER CRISIS? SHOCKING. GO ON.",
+      "I'M READY. HIT ME WITH YOUR CHAOS.",
+    ],
+    thinkingStates: [
+      "CALCULATING...",
+      "CHAOS LOADING...",
+      "SCREAMING INTERNALLY...",
+      "FLIPPING TABLES...",
+      "GENERATING VIOLENCE...",
+      "CONSULTING THE VOID...",
+      "EMBRACING ENTROPY...",
+      "MAXIMUM OVERDRIVE...",
+    ],
+    answerReveals: [
+      "[X]. DONE. GOODBYE.",
+      "IT'S [X]. DON'T QUESTION ME.",
+      "[X]!!! THAT'S FINAL!!!",
+      "[X]. I SAID WHAT I SAID.",
+      "THE ANSWER IS [X]. COPE.",
+      "[X]. NOW LEAVE ME ALONE.",
+      "[X]!!! GO!!! NOW!!!",
+    ],
+    lockConfirmations: [
+      "LOCKED. DON'T EVEN THINK ABOUT IT.",
+      "SEALED. IT'S OVER. MOVE ON.",
+      "DONE. LOCKED. GOODBYE.",
+      "NO TAKE-BACKS. EVER.",
+      "LOCKED FOREVER. BASICALLY.",
+      "SEALED. GO TOUCH GRASS OR WHATEVER.",
+    ],
+    limitReached: [
+      "5/5. YOU'RE CUT OFF.",
+      "THAT'S IT. I'M DONE WITH YOU TODAY.",
+      "LIMIT HIT. GO MAKE YOUR OWN MISTAKES.",
+      "5 DECISIONS. YOU'RE NEEDY. COME BACK TOMORROW.",
+    ],
+    buttonText: "JUST PICK ALREADY",
+    nextButton: "FINE. ANOTHER ONE. →",
+  },
+  terminal: {
+    tagline: "> system ready_",
+    inputPrompts: [
+      "> awaiting input...",
+      "> enter parameters:",
+      "> decision_required:",
+      "> input options:",
+      "> query pending...",
+      "> ready for data:",
+    ],
+    thinkingStates: [
+      "processing...",
+      "computing...",
+      "analyzing...",
+      "calculating probability...",
+      "running algorithm...",
+      "executing decision_tree...",
+    ],
+    answerReveals: [
+      "RESULT: [X]",
+      "OUTPUT: [X]",
+      "DECISION: [X]",
+      "ANALYSIS COMPLETE: [X]",
+      "OPTIMAL CHOICE: [X]",
+      "COMPUTED: [X]",
+    ],
+    lockConfirmations: [
+      "LOCKED. 24HR COOLDOWN.",
+      "DECISION CACHED.",
+      "COMMITTED TO MEMORY.",
+      "LOCK ENGAGED.",
+      "NO ROLLBACK AVAILABLE.",
+    ],
+    limitReached: [
+      "ERROR: DAILY LIMIT REACHED",
+      "5/5 QUERIES USED. TRY AGAIN LATER.",
+      "RATE LIMITED. UPGRADE FOR MORE.",
+      "QUOTA EXCEEDED.",
+    ],
+    buttonText: "EXECUTE",
+    nextButton: "NEW QUERY →",
+  }
+};
+
+// ============================================
+// STATE MANAGEMENT
+// ============================================
+let state = {
+  theme: localStorage.getItem('jpo-theme') || 'default',
+  picksToday: parseInt(localStorage.getItem('jpo-picksToday') || '5'),
+  totalDecisions: parseInt(localStorage.getItem('jpo-totalDecisions') || '0'),
+  lastResetDate: localStorage.getItem('jpo-lastResetDate') || new Date().toDateString(),
+  history: JSON.parse(localStorage.getItem('jpo-history') || '[]'),
+  isPremium: localStorage.getItem('jpo-premium') === 'true',
+  isCouplesMode: false,
+  currentQuestion: '',
+  currentOptions: [],
+  currentAnswer: '',
+};
+
+// Reset picks if new day
+if (state.lastResetDate !== new Date().toDateString()) {
+  state.picksToday = 5;
+  state.lastResetDate = new Date().toDateString();
+  saveState();
+}
+
+function saveState() {
+  localStorage.setItem('jpo-theme', state.theme);
+  localStorage.setItem('jpo-picksToday', state.picksToday.toString());
+  localStorage.setItem('jpo-totalDecisions', state.totalDecisions.toString());
+  localStorage.setItem('jpo-lastResetDate', state.lastResetDate);
+  localStorage.setItem('jpo-history', JSON.stringify(state.history));
+  localStorage.setItem('jpo-premium', state.isPremium);
+}
+
+// ============================================
+// DOM
+// ============================================
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+const screens = {
+  input: $('#inputScreen'),
+  veto: $('#vetoScreen'),
+  thinking: $('#thinkingScreen'),
+  result: $('#resultScreen'),
+  limit: $('#limitScreen'),
+};
+
+// ============================================
+// HELPERS
+// ============================================
+const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const getCopy = () => {
+  if (state.isCouplesMode) return COPY.couples;
+  return COPY[state.theme] || COPY.default;
+};
+
+// HAPTICS HELPER
+const triggerHaptic = (pattern) => {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+};
+
+function showScreen(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+function updateUI() {
+  const copy = getCopy();
+  
+  // Tagline Update
+  $('#tagline').textContent = copy.tagline;
+  
+  // Input Prompt Logic
+  if (state.isCouplesMode) {
+    $('#inputPrompt').textContent = getRandom(COPY.couples.inputPrompts);
+    $('#inputHint').textContent = "Minimum 3 options required for Veto mode";
+    $('#decideBtn').textContent = COPY.couples.buttonText;
+    $('#couplesModeBtn').classList.add('active');
+    $('#couplesModeBtn').innerHTML = "👩‍❤️‍👨 Veto Mode Active";
+  } else {
+    $('#inputPrompt').textContent = getRandom(COPY[state.theme]?.inputPrompts || COPY.default.inputPrompts);
+    $('#inputHint').textContent = '"A or B" • "Thing 1 vs Thing 2" • "Should I...?"';
+    const btnText = COPY[state.theme]?.buttonText || COPY.default.buttonText;
+    $('#decideBtn').textContent = state.isPremium ? "⚡ " + btnText : btnText;
+    $('#couplesModeBtn').classList.remove('active');
+    $('#couplesModeBtn').innerHTML = "👩‍❤️‍👨 Switch to Couples (Veto) Mode";
+  }
+
+  // Premium Styles
+  const decideBtn = $('#decideBtn');
+  decideBtn.classList.toggle('premium', state.isPremium);
+
+  // Remaining Text
+  const remaining = $('#picksRemaining');
+  if (state.isPremium) {
+    remaining.textContent = "∞ Unlimited Picks Unlocked (God Mode)";
+    remaining.className = "picks-remaining premium";
+  } else {
+    remaining.textContent = `${state.picksToday} pick${state.picksToday !== 1 ? 's' : ''} remaining today`;
+    remaining.className = `picks-remaining ${state.picksToday <= 2 ? 'low' : ''}`;
+  }
+  
+  // Stats
+  $('#statTotal').textContent = state.totalDecisions;
+  $('#statToday').textContent = state.isPremium ? '∞' : state.picksToday;
+  
+  // Theme Toggles
+  $$('.theme-option').forEach(opt => {
+    const themeName = opt.dataset.theme;
+    if (themeName !== 'default') {
+      opt.classList.toggle('locked', !state.isPremium);
+    }
+    opt.classList.toggle('active', themeName === state.theme);
+  });
+
+  // Share Btn Reset
+  const shareBtn = $('#shareBtn');
+  if (shareBtn.textContent.includes('Copied')) {
+    shareBtn.innerHTML = '📋 Copy Receipt';
+  }
+  
+  renderHistory();
+}
+
+function renderHistory() {
+  const container = $('#historyContainer');
+  const overlay = $('#historyLockOverlay');
+  
+  if (!state.isPremium) {
+    container.classList.add('history-blur');
+    overlay.style.display = 'flex';
+  } else {
+    container.classList.remove('history-blur');
+    overlay.style.display = 'none';
+  }
+
+  if (state.history.length === 0) {
+    container.innerHTML = `<div class="history-empty">No decisions made yet.<br>Go live a little.</div>`;
+    return;
+  }
+  
+  container.innerHTML = state.history.map(item => `
+    <div class="history-item">
+      <div class="history-top">
+        <span>${item.date} ${item.time}</span>
+        <span>${item.mode === 'couples' ? '👩‍❤️‍👨 Veto' : 'Classic'}</span>
+      </div>
+      <div class="history-query">${item.options}</div>
+      <div class="history-result">➜ ${item.result}</div>
+    </div>
+  `).join('');
+}
+
+function parseInput(input) {
+  const lower = input.toLowerCase().trim();
+  const splitRegex = /,|\/|\||\s+or\s+|\s+vs\.?\s+/i;
+  
+  if (splitRegex.test(input)) {
+    const options = input.split(splitRegex).map(s => s.trim());
+    return options.filter(o => o.length > 0);
+  }
+  
+  if (lower.startsWith('should i') || lower.startsWith('do i') || lower.startsWith('is it') || 
+      lower.startsWith('am i') || lower.startsWith('will ') || lower.startsWith('can i')) {
+    return ['Yes', 'No'];
+  }
+  
+  // Default fallbacks
+  return ['Yes', 'No'];
+}
+
+// ============================================
+// LOGIC
+// ============================================
+function toggleCouplesMode() {
+  state.isCouplesMode = !state.isCouplesMode;
+  logEvent('mode_toggled', { new_mode: state.isCouplesMode ? 'couples' : 'solo' });
+  updateUI();
+  triggerHaptic(20);
+}
+
+function handleDecide() {
+  const input = $('#mainInput').value.trim();
+  if (!input) return;
+  
+  if (checkEasterEgg(input)) {
+    $('#mainInput').value = '';
+    $('#decideBtn').disabled = true;
+    return;
+  }
+  
+  if (state.picksToday <= 0 && !state.isPremium) {
+    logEvent('limit_reached');
+    $('#limitMsg').textContent = getRandom(getCopy().limitReached);
+    showScreen('limit');
+    return;
+  }
+
+  // Parse Options
+  state.currentQuestion = input;
+  state.currentOptions = parseInput(input);
+  
+  // COUPLES MODE LOGIC
+  if (state.isCouplesMode) {
+    if (state.currentOptions.length < 3) {
+      alert("⚠️ Need at least 3 options for Veto Mode.\n\n(So your partner can kill one and we still have choices left!)");
+      return;
+    }
+    setupVetoScreen();
+    return;
+  }
+  
+  // STANDARD LOGIC
+  triggerHaptic(50);
+  showScreen('thinking');
+  runThinking();
+}
+
+function setupVetoScreen() {
+  const grid = $('#vetoGrid');
+  grid.innerHTML = '';
+  
+  state.currentOptions.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'veto-option';
+    btn.innerHTML = `<span>${opt}</span><span class="veto-icon">🗑️ Veto</span>`;
+    btn.onclick = () => handleVeto(idx);
+    grid.appendChild(btn);
+  });
+  
+  showScreen('veto');
+}
+
+function handleVeto(indexToRemove) {
+  triggerHaptic([50, 20]);
+  
+  // Remove the vetoed option
+  const killedOption = state.currentOptions[indexToRemove];
+  state.currentOptions.splice(indexToRemove, 1);
+  
+  logEvent('veto_action', { killed: killedOption });
+  
+  // Proceed to decision
+  showScreen('thinking');
+  runThinking();
+}
+
+function runThinking() {
+  const copy = getCopy();
+  let count = 0;
+  
+  const interval = setInterval(() => {
+    $('#thinkingText').textContent = getRandom(copy.thinkingStates);
+    triggerHaptic(10);
+    count++;
+    
+    if (count >= 4) {
+      clearInterval(interval);
+      showResult();
+    }
+  }, 600);
+}
+
+function showResult() {
+  const copy = getCopy();
+  state.currentAnswer = getRandom(state.currentOptions);
+  
+  $('#resultReveal').textContent = getRandom(copy.answerReveals).replace('[X]', state.currentAnswer);
+  $('#resultAnswer').textContent = state.currentAnswer;
+  $('#resultLockMsg').textContent = getRandom(copy.lockConfirmations);
+  
+  // HEAVY HAPTIC ON RESULT
+  triggerHaptic([50, 50, 50]);
+
+  // Update State
+  if (!state.isPremium) state.picksToday--;
+  state.totalDecisions++;
+  
+  // Analytics
+  logEvent('decision_made', { 
+    mode: state.isCouplesMode ? 'couples' : 'solo',
+    theme: state.theme
+  });
+  
+  // Add to History
+  const now = new Date();
+  state.history.unshift({
+    date: now.toLocaleDateString(),
+    time: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+    options: state.currentQuestion,
+    result: state.currentAnswer,
+    mode: state.isCouplesMode ? 'couples' : 'classic'
+  });
+  if (state.history.length > 20) state.history.pop();
+  
+  saveState();
+  updateUI();
+  
+  showScreen('result');
+}
+
+// ============================================
+// EASTER EGGS & MISC
+// ============================================
+function checkEasterEgg(input) {
+  const lower = input.toLowerCase().trim();
+  const eggs = {
+    'neo': matrixEffect, 'matrix': matrixEffect,
+    'fatality': fatalityEffect, 'finish him': fatalityEffect,
+    'hadouken': hadoukenEffect, 'nyan': nyanEffect,
+    'party': confettiEffect, 'confetti': confettiEffect,
+    'upupdowndown': unlockGodMode, 'unlimited': unlockGodMode
+  };
+  if (eggs[lower]) { eggs[lower](); return true; }
+  return false;
+}
+
+function unlockGodMode() {
+  state.isPremium = true;
+  saveState();
+  updateUI();
+  $('#mainInput').value = '';
+  logEvent('god_mode_unlocked', { method: 'cheat_code' });
+  triggerHaptic([100, 50, 100, 50, 500]);
+  const btn = $('#decideBtn');
+  btn.textContent = "🔓 GOD MODE UNLOCKED";
+  btn.classList.add('premium');
+  confettiEffect();
+  setTimeout(() => updateUI(), 2000);
+}
+
+// (Visual Effects - kept same as before)
+function matrixEffect() {
+  const canvas = $('#matrixCanvas'); const ctx = canvas.getContext('2d');
+  canvas.style.display = 'block'; canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const chars = '0123456789ABCDEF'; const fontSize = 16;
+  const columns = Math.floor(canvas.width/fontSize); const drops = Array(columns).fill(1);
+  let frames = 0;
+  function draw() {
+    ctx.fillStyle='rgba(0,0,0,0.05)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#0f0'; ctx.font=fontSize+'px monospace';
+    for(let i=0; i<drops.length; i++) {
+      const char = chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(char, i*fontSize, drops[i]*fontSize);
+      if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
+      drops[i]++;
+    }
+    frames++;
+    if(frames<180) requestAnimationFrame(draw);
+    else { canvas.style.display='none'; ctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+  draw();
+}
+function fatalityEffect() {
+  const c = $('#easterEggContainer'); c.innerHTML = `<div class="easter-overlay" style="background:#000;"><div class="fatality-text">FATALITY</div></div>`;
+  document.body.style.animation='shake 0.5s ease-out'; setTimeout(()=>{c.innerHTML='';document.body.style.animation='';},2000);
+}
+function hadoukenEffect() {
+  const c = $('#easterEggContainer'); c.innerHTML=`<div class="hadouken"></div>`; setTimeout(()=>c.innerHTML='',800);
+}
+function nyanEffect() {
+  const c = $('#easterEggContainer'); c.innerHTML=`<div class="nyan-container"><div class="nyan-rainbow"></div><div class="nyan-cat">🐱</div></div>`; setTimeout(()=>c.innerHTML='',3000);
+}
+function confettiEffect() {
+  const c = $('#easterEggContainer'); const colors=['#ff0','#f0f','#0ff','#f00','#0f0','#00f','#ff8800','#ff69b4']; let html='';
+  for(let i=0;i<60;i++){
+    const l=Math.random()*100; const d=Math.random()*0.8; const co=colors[Math.floor(Math.random()*colors.length)]; const s=6+Math.random()*8;
+    html+=`<div class="confetti-piece" style="left:${l}%;width:${s}px;height:${s}px;background:${co};animation-delay:${d}s;border-radius:${Math.random()>0.5?'50%':'0'};"></div>`;
+  }
+  c.innerHTML=html; setTimeout(()=>c.innerHTML='',3000);
+}
+
+// ============================================
+// NAVIGATION & LISTENERS
+// ============================================
+function handleNext() {
+  $('#mainInput').value = '';
+  $('#decideBtn').disabled = true;
+  updateUI();
+  showScreen('input');
+}
+function handleReset() {
+  state.picksToday = 5; saveState(); updateUI(); showScreen('input');
+}
+function openSettings() { $('#settingsOverlay').classList.add('active'); $('#settingsPanel').classList.add('active'); }
+function closeSettings() { $('#settingsOverlay').classList.remove('active'); $('#settingsPanel').classList.remove('active'); }
+function setTheme(theme) {
+  if (theme !== 'default' && !state.isPremium) {
+    alert("🔒 Premium Required\n\nUnlock God Mode to access premium personalities.");
+    return;
+  }
+  state.theme = theme; document.body.dataset.theme = theme; saveState(); updateUI();
+}
+
+$('#mainInput').addEventListener('input', (e) => { $('#decideBtn').disabled = !e.target.value.trim(); });
+$('#mainInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.value.trim()) handleDecide(); });
+$('#decideBtn').addEventListener('click', handleDecide);
+$('#nextCrisisBtn').addEventListener('click', handleNext);
+$('#resetBtn').addEventListener('click', handleReset);
+$('#upgradeBtn').addEventListener('click', () => alert('Type "upupdowndown" to simulate purchase...'));
+$('.history-lock-btn').addEventListener('click', () => alert('Type "upupdowndown" to simulate purchase...'));
+$('#couplesModeBtn').addEventListener('click', toggleCouplesMode);
+$('#settingsBtn').addEventListener('click', openSettings);
+$('#settingsOverlay').addEventListener('click', closeSettings);
+$('#settingsClose').addEventListener('click', closeSettings);
+$('#clearHistoryBtn').addEventListener('click', () => { if(confirm("Forget mistakes?")) { state.history = []; saveState(); updateUI(); } });
+$('#themeGrid').addEventListener('click', (e) => { const o = e.target.closest('.theme-option'); if (o) setTheme(o.dataset.theme); });
+$$('.quick-pick').forEach(btn => {
+  btn.addEventListener('click', () => { $('#mainInput').value = btn.textContent; $('#decideBtn').disabled = false; });
+});
+$('#shareBtn').addEventListener('click', () => {
+  const copy = getCopy();
+  const optionsText = state.currentOptions && state.currentOptions.length > 0 ? state.currentOptions.join(', ') : 'Unknown chaos';
+  const prefix = state.isCouplesMode ? '👩‍❤️‍👨 Couples Veto decided: ' : '🔮 Just Pick One decided: ';
+  const text = `${prefix}${state.currentAnswer}\n\nOptions: ${optionsText}\n${copy.tagline}`;
+  
+  logEvent('receipt_shared', { mode: state.isCouplesMode ? 'couples' : 'solo' });
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = $('#shareBtn'); const original = btn.innerHTML; btn.textContent = "✅ Copied!"; triggerHaptic([20, 20]); setTimeout(() => btn.innerHTML = original, 2000);
+  });
+});
+
+// Settings Long Press
+let logoTimer = null;
+$('#logo').addEventListener('pointerdown', () => { logoTimer = setTimeout(openSettings, 800); });
+$('#logo').addEventListener('pointerup', () => clearTimeout(logoTimer));
+$('#logo').addEventListener('pointerleave', () => clearTimeout(logoTimer));
+
+// Init
+document.body.dataset.theme = state.theme;
+updateUI();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
